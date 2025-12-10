@@ -1,50 +1,192 @@
-# Welcome to your Expo app 👋
+# City Pulse - Complete Production Setup Guide
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+> A modern React Native news aggregation app with real-time emergency alerts and smart city features.
 
-## Get started
+## 📋 Table of Contents
+- [Project Overview](#project-overview)
+- [Quick Start](#quick-start)
+- [Project Structure](#project-structure)
+- [Architecture](#architecture)
+- [Key Features](#key-features)
+- [Configuration](#configuration)
 
-1. Install dependencies
+## 🎯 Project Overview
 
-   ```bash
-   npm install
-   ```
+**City Pulse** is a feature-rich React Native application that delivers:
+- 🌍 City-based news filtering
+- 📰 Real-time news feed with WebView integration
+- 🔖 Persistent bookmark system
+- 🚨 Emergency alerts framework
+- 🔄 Pull-to-refresh functionality
+- 📱 Responsive design
+- ⚡ TypeScript type safety
 
-2. Start the app
+**Tech Stack:**
+- React Native + Expo
+- TypeScript
+- AsyncStorage for persistence
+- React Navigation
+- Axios for API calls
+- NewsAPI integration
 
-   ```bash
-   npx expo start
-   ```
+## 🚀 Quick Start (5 Minutes)
 
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
+### 1. Prerequisites
 ```bash
-npm run reset-project
+node --version
+npm --version
+
+# Install Expo CLI globally
+npm install -g expo-cli
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### 2. Clone & Setup
+```bash
+npx create-expo-app city-pulse
+cd city-pulse
+# Install dependencies
+```
 
-## Learn more
+Configure Environment
+```bash
+cp .env.example .env
+#Edit .env and add your NewsAPI key
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+### 4. Run
+```bash
+npx expo start
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+# Press 'i' for iOS simulator
+# Press 'a' for Android emulator
+# Press 'w' for web
+```
 
-## Join the community
+## 5. Project Structure
 
-Join our community of developers creating universal apps.
+```
+city-pulse/
+├── App.tsx                              # Main entry point
+├── package.json                         # Dependencies
+├── tsconfig.json                        # TypeScript config
+├── babel.config.js                      # Babel config
+├── app.json                             # Expo config
+├── .env                                 # Environment variables
+│
+├── src/
+│   ├── config/
+│   │   ├── api.ts                       # Axios client with interceptors
+│   │   ├── constants.ts                 # App-wide constants
+│   │   └── storage.ts                   # (reference only)
+│   │
+│   ├── services/
+│   │   ├── newsService.ts               # NewsAPI client
+│   │   └── storageService.ts            # AsyncStorage wrapper
+│   │
+│   ├── context/
+│   │   └── BookmarkContext.tsx          # Global bookmark state
+│   │
+│   ├── types/
+│   │   └── index.ts                     # TypeScript interfaces
+│   │
+│   ├── screens/
+│   │   ├── CitySelectionScreen.tsx      # City picker (initial)
+│   │   ├── NewsFeedScreen.tsx           # Main feed with search
+│   │   ├── NewsWebViewScreen.tsx        # Article viewer
+│   │   ├── BookmarksScreen.tsx          # Saved articles
+│   │   └── EmergencyAlertsScreen.tsx    # Alert feed
+│   │
+│   ├── components/
+│   │   ├── NewsCard.tsx                 # Article card
+│   │   ├── AlertCard.tsx                # Emergency alert card
+│   │   ├── LoadingSpinner.tsx           # Loading indicator
+│   │   ├── EmptyState.tsx               # Empty list state
+│   │   └── ErrorBoundary.tsx            # (optional)
+│   │
+│   ├── navigation/
+│   │   └── RootNavigator.tsx            # Tab + Stack navigation
+│   │
+│   └── utils/
+│       ├── themes.ts                    # Color system
+│       └── helpers.ts                   # Utility functions
+│
+└── assets/                              # Icons, images, etc.
+```
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## Architecture
+
+### State Management
+- **Context API** for bookmarks (lightweight, no Redux)
+- **useState/useReducer** for local screen state
+- **AsyncStorage** for persistence
+
+### Data Flow
+```
+API (NewsAPI)
+    ↓
+newsService (Axios client)
+    ↓
+Screen Components (useState)
+    ↓
+UI (FlatList rendering)
+    ↓
+User Interactions (AsyncStorage)
+```
+
+### Navigation Structure
+```
+RootNavigator
+├── CitySelectionScreen (initial)
+└── MainApp (TabNavigator)
+    ├── News Stack
+    │   ├── NewsFeedScreen
+    │   └── NewsWebViewScreen
+    ├── Bookmarks Stack
+    │   ├── BookmarksScreen
+    │   └── NewsWebViewScreen
+    └── Alerts Stack
+        └── EmergencyAlertsScreen
+```
+
+## Key Features
+
+### 1. City Selection
+- Pre-configured 10 major cities
+- Persistent selection in AsyncStorage
+- Quick toggle between cities
+
+### 2. News Feed
+- Real-time articles from NewsAPI
+- Pagination (20 articles per page)
+- Search functionality (client-side)
+- Pull-to-refresh
+- Loading states and error handling
+
+### 3. Bookmarking
+- Add/remove articles instantly
+- Persistent storage with AsyncStorage
+- Deduplicated by URL
+- Visual bookmark indicator
+
+### 4. Emergency Alerts
+- Mock data (ready for API integration)
+- Severity-based color coding
+- Type-based emojis
+- Time formatting
+
+### 5. Article Viewing
+- WebView for original article content
+- Share functionality
+- Bookmark toggle
+- Back navigation
+
+## Configuration
+
+### API Setup
+1. Go to [newsapi.org](https://newsapi.org) or [GNews API](https://gnews.io)
+2. Sign up
+3. Copy API key
+4. Add to `.env`:
+   ```
+   EXPO_PUBLIC_NEWS_API_KEY=your_key_here
+   ```
